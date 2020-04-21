@@ -24,6 +24,8 @@ public class BagController : MonoBehaviour
     private bool _isDragging = false;
     private Vector2 _startingPosition;
 
+    private Vector3 _nearestGridOffset;
+
     private SpriteRenderer _spriteRenderer;
     private Camera _camera;
 
@@ -41,6 +43,9 @@ public class BagController : MonoBehaviour
         bool canBagBePlaced = true;
         _matchedGridElements = new List<GridElementController>();
 
+        bool isOffsetFound = false;
+        Vector2 nearestGridOffset = new Vector2();
+
         foreach (Collider2D bagAnchor in bagAnchors)
         {
             bool canAnchorBePlaced = false;
@@ -51,11 +56,23 @@ public class BagController : MonoBehaviour
                 
                 if (!gridElement.isOccupied && bagAnchor.IsTouching(gridElementCollider))
                 {
+                    if (!isOffsetFound)
+                    {
+                        isOffsetFound = true;
+                        nearestGridOffset = gridElementCollider.transform.position - bagAnchor.transform.position;
+                    }
+                    
                     canAnchorBePlaced = true;
                     _matchedGridElements.Add(gridElement);
                 }
             }
+            
             canBagBePlaced = canBagBePlaced && canAnchorBePlaced;
+        }
+
+        if (canBagBePlaced)
+        {
+            _nearestGridOffset = nearestGridOffset;
         }
         
         return canBagBePlaced;
@@ -156,6 +173,9 @@ public class BagController : MonoBehaviour
         {
             gridElement.isOccupied = true;
         }
+
+        // Position bag on grid
+        transform.position += _nearestGridOffset;
     }
 
     void Update()
