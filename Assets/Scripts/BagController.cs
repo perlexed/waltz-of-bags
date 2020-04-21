@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Helpers;
 using UnityEngine;
 
 public class BagController : MonoBehaviour
 {
-    public bool canBeRotated = false;
-    public bool isOnShelf = false;
+    public bool isOnShelf;
 
+    public Color defaultColor = new Color(1, 1, 1, 1);
+    public Color canBePlacedColor = new Color(0.5f, 1, 0.5f, 1);
+    public Color wrongPlaceColor = new Color(1, 0.5f, 0.5f, 1);
+    
     public Collider2D[] bagAnchors;
     public Collider2D[] gridElements;
     public TimelineController timelineController;
@@ -16,6 +20,7 @@ public class BagController : MonoBehaviour
     private const string SortingLayerDraggedBag = "dragged_bag";
     private const string SortingLayerBags = "bags";
 
+    private bool _canBePlaced = false;
     private bool _isDragging = false;
     private Vector2 _startingPosition;
 
@@ -65,7 +70,7 @@ public class BagController : MonoBehaviour
         
         if (!_isDragging)
         {
-            if (!interactionManager.isCarryingBag)
+            if (!interactionManager.IsCarryingBag)
             {
                 StartDragging();
             }
@@ -75,16 +80,23 @@ public class BagController : MonoBehaviour
         }
         else
         {
-            // @todo flash bag with red
-            Debug.Log("bag can't be placed");
+            _spriteRenderer.color = wrongPlaceColor;
+            StartCoroutine(FlashBagOnWrongPlaceDrop());
         }
     }
 
     private void StartDragging()
     {
+        if (isOnShelf)
+        {
+            SetShelfSpaceFree();
+        }
+        
         isOnShelf = false;
         
-        interactionManager.isCarryingBag = true;
+        SetReadinessToBePlaced(CanBePlaced());
+
+        interactionManager.IsCarryingBag = true;
         _isDragging = true;
         _spriteRenderer.sortingLayerID = SortingLayer.NameToID(SortingLayerDraggedBag);
 
@@ -94,7 +106,16 @@ public class BagController : MonoBehaviour
         }
         _matchedGridElements = new List<GridElementController>();
 
-        SetTransparency(0.5f);
+        SpriteHelper.SetAlpha(_spriteRenderer.color, 0.5f);
+    }
+
+    private void SetShelfSpaceFree()
+    {
+        foreach (GridElementController gridElement in _matchedGridElements)
+        {
+            gridElement.isOccupied = false;
+        }
+
     }
 
     private void StopDragging(bool isPlacedOnShelf)
@@ -102,9 +123,11 @@ public class BagController : MonoBehaviour
         _isDragging = false;
         _spriteRenderer.sortingLayerID = SortingLayer.NameToID(SortingLayerBags);
 
-        interactionManager.isCarryingBag = false;
+        SetReadinessToBePlaced(false);
 
-        SetTransparency(1f);
+        interactionManager.IsCarryingBag = false;
+
+        SpriteHelper.SetAlpha(_spriteRenderer.color, 1);
 
         if (isPlacedOnShelf)
         {
@@ -118,6 +141,8 @@ public class BagController : MonoBehaviour
 
     public void PlaceOnCart()
     {
+        SetShelfSpaceFree();
+        
         transform.position = _startingPosition;
         isOnShelf = false;
     }
@@ -135,24 +160,49 @@ public class BagController : MonoBehaviour
 
     void Update()
     {
-        if (_isDragging)
+        if (!_isDragging)
         {
-            if (interactionManager.allowInteractions && Input.GetMouseButtonUp(1))
-            {
-                StopDragging(false);
-            }
-            else
-            {
-                Vector2 cursorPosition = _camera.ScreenToWorldPoint(Input.mousePosition);
-                transform.position = new Vector2(cursorPosition.x, cursorPosition.y);
-            }
+            return;
+        }
+        
+        UpdateBagReadinessToBePlaced();
+        
+        if (interactionManager.allowInteractions && Input.GetMouseButtonUp(1))
+        {
+            StopDragging(false);
+        }
+        // Move the bag with the cursor
+        else
+        {
+            Vector2 cursorPosition = _camera.ScreenToWorldPoint(Input.mousePosition);
+            transform.position = new Vector2(cursorPosition.x, cursorPosition.y);
         }
     }
 
-    private void SetTransparency(float transparency)
+    private void UpdateBagReadinessToBePlaced()
     {
-        Color semiTransparentColor = _spriteRenderer.color;
-        semiTransparentColor.a = transparency;
-        _spriteRenderer.color = semiTransparentColor;
+        bool newReadinessToBePlacedFlag = CanBePlaced(); 
+        if (_canBePlaced == newReadinessToBePlacedFlag)
+        {
+            return;
+        }
+
+        _canBePlaced = newReadinessToBePlacedFlag;
+        SetReadinessToBePlaced(_canBePlaced);
+    }
+
+    private void SetReadinessToBePlaced(bool canBePlaced)
+    {
+        _spriteRenderer.color = canBePlaced ? canBePlacedColor : defaultColor;
+    }
+
+    private IEnumerator FlashBagOnWrongPlaceDrop()
+    {
+        yield return new WaitForSeconds(1);
+        
+        if (_spriteRenderer.color == wrongPlaceColor)
+        {
+            _spriteRenderer.color = defaultColor;
+        }
     }
 }

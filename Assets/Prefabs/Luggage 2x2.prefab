@@ -130,15 +130,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 110a97b76602ca34f843c9fa7b24eb20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canBeRotated: 0
   isOnShelf: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  canBePlacedColor: {r: 0.5, g: 1, b: 0.5, a: 1}
+  wrongPlaceColor: {r: 0.8962264, g: 0.4523407, b: 0.4523407, a: 0}
   bagAnchors:
   - {fileID: 537569566623389544}
   - {fileID: 4216465974936422944}
   - {fileID: 6059785247572830756}
   - {fileID: 6308267725618036278}
   gridElements: []
-  TimelineController: {fileID: 0}
+  timelineController: {fileID: 0}
+  interactionManager: {fileID: 0}
 --- !u!61 &4196646774127102042
 BoxCollider2D:
   m_ObjectHideFlags: 0
