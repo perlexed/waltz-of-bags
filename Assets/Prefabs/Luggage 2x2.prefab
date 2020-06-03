@@ -133,7 +133,7 @@ MonoBehaviour:
   isOnShelf: 0
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
   canBePlacedColor: {r: 0.5, g: 1, b: 0.5, a: 1}
-  wrongPlaceColor: {r: 0.8962264, g: 0.4523407, b: 0.4523407, a: 0}
+  wrongPlaceColor: {r: 1, g: 0.5, b: 0.5, a: 1}
   bagAnchors:
   - {fileID: 537569566623389544}
   - {fileID: 4216465974936422944}
@@ -142,6 +142,8 @@ MonoBehaviour:
   gridElements: []
   timelineController: {fileID: 0}
   interactionManager: {fileID: 0}
+  outlineMaterial: {fileID: 2100000, guid: 4934359340f01354789d32e59bd3d77a, type: 2}
+  normalMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!61 &4196646774127102042
 BoxCollider2D:
   m_ObjectHideFlags: 0

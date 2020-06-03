@@ -11,10 +11,12 @@ public class TimelineController : MonoBehaviour
     public bool isRunning = true;
     public Text victoryText;
     public Text continueText;
+    public Text quitText;
     public InteractionManager interactionManager;
 
     public float victoryWaitTime = 1f;
     private float _victoryTime;
+    private bool _isInQuitConfirm;
 
     public void RefreshBagsState()
     {
@@ -57,8 +59,43 @@ public class TimelineController : MonoBehaviour
         interactionManager.allowInteractions = true;
     }
 
+    void OnGUI()
+    {
+        Event e = Event.current;
+        if (e.isKey && e.keyCode != KeyCode.Escape)
+        {
+            CancelQuitCheck();
+        }
+    }
+
+    private void CancelQuitCheck()
+    {
+        quitText.gameObject.SetActive(false);
+        _isInQuitConfirm = false;
+        interactionManager.allowInteractions = true;
+    }
+    
+    private void QuitCheck()
+    {
+        if (_isInQuitConfirm)
+        {
+            Application.Quit();
+        }
+        else
+        {
+            _isInQuitConfirm = true;
+            quitText.gameObject.SetActive(true);
+            interactionManager.allowInteractions = false;
+        }
+    }
+
     private void Update()
     {
+        if (Input.GetButtonUp("Cancel"))
+        {
+            QuitCheck();
+        }
+
         if (!isRunning && Time.time - _victoryTime >= victoryWaitTime)
         {
             if (!continueText.gameObject.activeSelf)

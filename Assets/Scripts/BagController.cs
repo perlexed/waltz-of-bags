@@ -16,6 +16,9 @@ public class BagController : MonoBehaviour
     public Collider2D[] gridElements;
     public TimelineController timelineController;
     public InteractionManager interactionManager;
+
+    public Material outlineMaterial;
+    public Material normalMaterial;
     
     private const string SortingLayerDraggedBag = "dragged_bag";
     private const string SortingLayerBags = "bags";
@@ -100,6 +103,16 @@ public class BagController : MonoBehaviour
             _spriteRenderer.color = wrongPlaceColor;
             StartCoroutine(FlashBagOnWrongPlaceDrop());
         }
+    }
+
+    public void OnMouseOver()
+    {
+        _spriteRenderer.material = outlineMaterial;
+    }
+
+    public void OnMouseExit()
+    {
+        _spriteRenderer.material = normalMaterial;
     }
 
     private void StartDragging()
