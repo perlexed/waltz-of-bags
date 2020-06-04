@@ -45,7 +45,7 @@ public class TimelineController : MonoBehaviour
         victoryText.gameObject.SetActive(true);
     }
 
-    private void Reset()
+    public void Reset()
     {
         foreach (BagController bagController in bags)
         {
