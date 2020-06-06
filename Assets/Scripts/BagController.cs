@@ -19,18 +19,23 @@ public class BagController : MonoBehaviour
 
     public Material outlineMaterial;
     public Material normalMaterial;
+
+    public AudioClip pickupSound;
+    public AudioClip dropOnCartSound;
+    public AudioClip dropOnShelfSound;
     
     private const string SortingLayerDraggedBag = "dragged_bag";
     private const string SortingLayerBags = "bags";
 
-    private bool _canBePlaced = false;
-    private bool _isDragging = false;
+    private bool _canBePlaced;
+    private bool _isDragging;
     private Vector2 _startingPosition;
 
     private Vector3 _nearestGridOffset;
 
     private SpriteRenderer _spriteRenderer;
     private Camera _camera;
+    private AudioSource _audioSource;
 
     private List<GridElementController> _matchedGridElements = new List<GridElementController>();
 
@@ -39,6 +44,7 @@ public class BagController : MonoBehaviour
         _camera = Camera.main;
         _spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         _startingPosition = transform.position;
+        _audioSource = gameObject.GetComponent<AudioSource>();
     }
 
     private bool CanBePlaced()
@@ -117,6 +123,9 @@ public class BagController : MonoBehaviour
 
     private void StartDragging()
     {
+        _audioSource.clip = pickupSound;
+        _audioSource.Play();
+
         if (isOnShelf)
         {
             SetShelfSpaceFree();
@@ -161,10 +170,14 @@ public class BagController : MonoBehaviour
 
         if (isPlacedOnShelf)
         {
+            _audioSource.clip = dropOnShelfSound;
+            _audioSource.Play();
             PlaceOfShelf();
         }
         else
         {
+            _audioSource.clip = dropOnCartSound;
+            _audioSource.Play();
             PlaceOnCart();
         }
     }

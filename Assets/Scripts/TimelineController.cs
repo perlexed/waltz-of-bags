@@ -38,6 +38,8 @@ public class TimelineController : MonoBehaviour
 
     private void SetVictory()
     {
+        gameObject.GetComponent<AudioSource>().Play();
+        
         isRunning = false;
         _victoryTime = Time.time;
         interactionManager.allowInteractions = false;
