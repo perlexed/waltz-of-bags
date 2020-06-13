@@ -13,7 +13,7 @@ public class BagController : MonoBehaviour
     public Color wrongPlaceColor = new Color(1, 0.5f, 0.5f, 1);
     
     public Collider2D[] bagAnchors;
-    public Collider2D[] gridElements;
+    public GameObject shelfGrid;
     public TimelineController timelineController;
     public InteractionManager interactionManager;
 
@@ -36,6 +36,7 @@ public class BagController : MonoBehaviour
     private SpriteRenderer _spriteRenderer;
     private Camera _camera;
     private AudioSource _audioSource;
+    private Collider2D[] _gridElements;
 
     private List<GridElementController> _matchedGridElements = new List<GridElementController>();
 
@@ -45,6 +46,7 @@ public class BagController : MonoBehaviour
         _spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         _startingPosition = transform.position;
         _audioSource = gameObject.GetComponent<AudioSource>();
+        _gridElements = shelfGrid.GetComponentsInChildren<Collider2D>();
     }
 
     private bool CanBePlaced()
@@ -59,7 +61,7 @@ public class BagController : MonoBehaviour
         {
             bool canAnchorBePlaced = false;
 
-            foreach (Collider2D gridElementCollider in gridElements)
+            foreach (Collider2D gridElementCollider in _gridElements)
             {
                 GridElementController gridElement = gridElementCollider.GetComponent<GridElementController>();
                 
