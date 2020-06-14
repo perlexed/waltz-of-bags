@@ -12,7 +12,10 @@ namespace Services
 {
     public static class GridTilingService
     {
-        private const int MaxGridGenerationCount = 100;
+        /**
+         * Maximum attempts number of covering grid with tiles before assuming the full coverage is impossible
+         */
+        private const int MaxGridGenerationCount = 1000;
         
         private static readonly Random Rnd = new Random();
         

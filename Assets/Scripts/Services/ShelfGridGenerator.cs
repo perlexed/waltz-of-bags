@@ -12,6 +12,7 @@ namespace Services
         public GameObject gridElementPrefab;
 
         private InteractionManager _interactionManager;
+        private TimelineController _timelineController;
         
         private static readonly int[,] DefaultLevelGrid = {
             {1, 1, 1, 1, 1, 1},
@@ -21,23 +22,29 @@ namespace Services
         private void Start()
         {
             _interactionManager = gameObject.GetComponent<InteractionManager>();
+            _timelineController = gameObject.GetComponent<TimelineController>();
             
             GenerateShelfGrid(DefaultLevelGrid);
+            
+            foreach (BagController bag in _timelineController.bags)
+            {
+                bag.RefreshGridElements();
+            }
         }
 
         public void GenerateShelfGrid(int[,] sourceGrid)
         {
-            int[,] gridBase = {
-                {0, 0, 0, 0},
-                {1, 0, 0, 0},
-            };
-            
-            Grid grid = new Grid(gridBase);
-
-            for (int i = 0; i < 20; i++)
-            {
-                GridTilingService.GetTilesForGrid(grid);
-            }
+            // int[,] gridBase = {
+            //     {0, 0, 0, 0},
+            //     {1, 0, 0, 0},
+            // };
+            //
+            // Grid grid = new Grid(gridBase);
+            //
+            // for (int i = 0; i < 20; i++)
+            // {
+            //     GridTilingService.GetTilesForGrid(grid);
+            // }
             
             
             for (int y = 0; y < sourceGrid.GetLength(0); y += 1) {

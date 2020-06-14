@@ -98,13 +98,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOnShelf: 0
+  canBeRotated: 1
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
   canBePlacedColor: {r: 0.5, g: 1, b: 0.5, a: 1}
   wrongPlaceColor: {r: 0.8962264, g: 0.4523407, b: 0.4523407, a: 1}
   bagAnchors:
   - {fileID: 2101711929765618733}
   - {fileID: 3271156700997538411}
-  gridElements: []
+  shelfGrid: {fileID: 0}
   timelineController: {fileID: 0}
   interactionManager: {fileID: 0}
   outlineMaterial: {fileID: 2100000, guid: 4934359340f01354789d32e59bd3d77a, type: 2}

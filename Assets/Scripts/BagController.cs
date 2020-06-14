@@ -7,6 +7,7 @@ using UnityEngine;
 public class BagController : MonoBehaviour
 {
     public bool isOnShelf;
+    public bool canBeRotated;
 
     public Color defaultColor = new Color(1, 1, 1, 1);
     public Color canBePlacedColor = new Color(0.5f, 1, 0.5f, 1);
@@ -27,6 +28,7 @@ public class BagController : MonoBehaviour
     private const string SortingLayerDraggedBag = "dragged_bag";
     private const string SortingLayerBags = "bags";
 
+    private bool _isRotated;
     private bool _canBePlaced;
     private bool _isDragging;
     private Vector2 _startingPosition;
@@ -46,6 +48,10 @@ public class BagController : MonoBehaviour
         _spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         _startingPosition = transform.position;
         _audioSource = gameObject.GetComponent<AudioSource>();
+    }
+
+    public void RefreshGridElements()
+    {
         _gridElements = shelfGrid.GetComponentsInChildren<Collider2D>();
     }
 
@@ -215,16 +221,34 @@ public class BagController : MonoBehaviour
         
         UpdateBagReadinessToBePlaced();
         
-        if (interactionManager.allowInteractions && Input.GetMouseButtonUp(1))
+        if (interactionManager.allowInteractions)
         {
-            StopDragging(false);
+            if (Input.GetButtonUp("Jump"))
+            {
+                Rotate();
+            }
+
+            if (Input.GetMouseButtonUp(1))
+            {
+                StopDragging(false);
+            }
+            else
+            {
+                Vector2 cursorPosition = _camera.ScreenToWorldPoint(Input.mousePosition);
+                transform.position = new Vector2(cursorPosition.x, cursorPosition.y);
+            }
         }
-        // Move the bag with the cursor
-        else
+    }
+
+    private void Rotate()
+    {
+        if (!canBeRotated)
         {
-            Vector2 cursorPosition = _camera.ScreenToWorldPoint(Input.mousePosition);
-            transform.position = new Vector2(cursorPosition.x, cursorPosition.y);
+            return;
         }
+        
+        transform.Rotate(0, 0, _isRotated ? -90 : 90);
+        _isRotated = !_isRotated;
     }
 
     private void UpdateBagReadinessToBePlaced()
