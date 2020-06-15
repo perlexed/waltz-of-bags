@@ -148,5 +148,22 @@ namespace GridModule.Models
 
             return availablePoints;
         }
+
+        public List<GridPoint> GetEmptyPoints()
+        {
+            List<GridPoint> emptyPoints = new List<GridPoint>();
+            
+            for (int y = 0; y < Height; y += 1)
+            {
+                for (int x = 0; x < Width; x += 1) {
+                    if (_grid[y, x] == 0)
+                    {
+                        emptyPoints.Add(new GridPoint{X = x, Y = y});
+                    }
+                }
+            }
+
+            return emptyPoints;
+        }
     }
 }

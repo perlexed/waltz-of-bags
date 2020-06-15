@@ -9,5 +9,10 @@
         {
             return $"[{Height}, {Width}]";
         }
+
+        public string GetStringHash()
+        {
+            return $"{Height}X{Width}";
+        }
     }
 }

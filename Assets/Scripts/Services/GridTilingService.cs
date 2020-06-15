@@ -1,23 +1,64 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Enums;
 using UnityEngine;
 using GridModule.Models;
 using Grid = GridModule.Models.Grid;
 using Tile = GridModule.Models.Tile;
-using Random = System.Random;
-
 
 namespace Services
 {
-    public static class GridTilingService
+    using Difficulties = Dictionary<DifficultyEnum, int>;
+    
+    public class GridTilingService
     {
+        private const int NormalDifficultyPointsPercentage = 10;
+        
+        private readonly Grid _grid;
+        private readonly List<TileData> _tiles;
+        private readonly DifficultyEnum _difficulty;
+
+        private readonly Difficulties _freePointsByDifficulty;
+
+        public struct TileSetSearchResponse
+        {
+            public List<Tile> TileSet;
+
+            public bool IsTileSetFound;
+        }
+
+        private GridTilingService(Grid grid, DifficultyEnum difficulty)
+        {
+            _grid = grid;
+            _difficulty = difficulty;
+            
+            _tiles = AvailableTiles.ConvertAll(tile => new TileData
+            {
+                Tile = tile,
+                AvailablePoints = grid.GetAvailablePoints(tile)
+            });    
+
+
+            int hardMinimumFreePoints = GetHardMinimumFreePoints();
+            int normalMinimumFreePointsByPercentage =
+                (int) Math.Round((double) (100 * NormalDifficultyPointsPercentage) / _grid.FreePointsCount);
+            
+            _freePointsByDifficulty = new Difficulties
+            {
+                {DifficultyEnum.Hard, hardMinimumFreePoints},
+                {DifficultyEnum.Normal, Math.Max(hardMinimumFreePoints + 2, normalMinimumFreePointsByPercentage)}
+            };
+            
+            // Debug.Log($"Difficulties: hard - {_freePointsByDifficulty[DifficultyEnum.Hard]}, normal - {_freePointsByDifficulty[DifficultyEnum.Normal]}");
+        }
+        
         /**
          * Maximum attempts number of covering grid with tiles before assuming the full coverage is impossible
          */
         private const int MaxGridGenerationCount = 1000;
         
-        private static readonly Random Rnd = new Random();
+        private static readonly System.Random Rnd = new System.Random();
         
         private static readonly List<Tile> AvailableTiles = new List<Tile>
         {
@@ -27,45 +68,50 @@ namespace Services
             new Tile { Height = 1, Width = 2 },
             new Tile { Height = 2, Width = 1 },
         };
-        
-        public static List<Tile> GetTilesForGrid(Grid grid)
+
+        public static TileSetSearchResponse GetTilesForGrid(Grid grid, DifficultyEnum difficulty)
         {
-            // Debug.Log(grid);
+            return (new GridTilingService(grid, difficulty)).GetTiles();
+        }
 
-            List<TileData> tiles = AvailableTiles.ConvertAll(tile => new TileData
-            {
-                Tile = tile,
-                AvailablePoints = grid.GetAvailablePoints(tile)
-            });
-
-            int targetEmptyFreePointsCount = 0;
+        private TileSetSearchResponse GetTiles()
+        {
+            return GetTilesByFreePoints(_freePointsByDifficulty[_difficulty]);
+        }
+        
+        private TileSetSearchResponse GetTilesByFreePoints(int targetEmptyFreePointsCount)
+        {
             int gridGenerationCount = 0;
             List<Tile> tileSet;
             
             do
             {
-                grid.Reset();
-                tileSet = GetTileSetForGrid(tiles, grid);
+                _grid.Reset();
+                tileSet = GetTileSet();
                 gridGenerationCount++;
-                // Debug.Log(grid);
+                // Debug.Log(_grid);
                 // Debug.Log($"Tiles ({tileSet.Count}): " + string.Join(", ", tileSet));
-            } while (grid.FreePointsCount > targetEmptyFreePointsCount && gridGenerationCount != MaxGridGenerationCount);
+            } while (_grid.FreePointsCount > targetEmptyFreePointsCount && gridGenerationCount != MaxGridGenerationCount);
 
 
             // Debug.Log(grid);
-            Debug.Log(
-                tileSet.Count > 0
-                    ? $"Grid tiled in {gridGenerationCount} attempts: {string.Join(", ", tileSet)}"
-                    : $"Grid didn't tiled in {gridGenerationCount} attempts"
-            );
-            
-            return tileSet;
+            // Debug.Log(
+            //     tileSet.Count > 0
+            //         ? $"Grid tiled in {gridGenerationCount} attempts: {string.Join(", ", tileSet)}"
+            //         : $"Grid didn't tiled in {gridGenerationCount} attempts"
+            // );
+
+            return new TileSetSearchResponse
+            {
+                TileSet = tileSet,
+                IsTileSetFound = _grid.FreePointsCount <= targetEmptyFreePointsCount
+            };
         }
 
-        private static List<Tile> GetTileSetForGrid(List<TileData> tiles, Grid grid)
+        private List<Tile> GetTileSet()
         {
             List<TileData> availableTiles = new List<TileData>();
-            foreach (var tile in tiles)
+            foreach (var tile in _tiles)
             {
                 availableTiles.Add(tile);
             }
@@ -82,10 +128,10 @@ namespace Services
             
                 foreach (GridPoint point in randomTile.AvailablePoints)
                 {
-                    if (grid.CanTileBePlaced(randomTile.Tile, point))
+                    if (_grid.CanTileBePlaced(randomTile.Tile, point))
                     {
                         isTilePlaced = true;
-                        grid.PlaceTile(randomTile.Tile, point);
+                        _grid.PlaceTile(randomTile.Tile, point);
                         placedTiles.Add(randomTile.Tile);
                         // Debug.Log(randomTile.Tile);
                         // Debug.Log(grid);
@@ -101,6 +147,22 @@ namespace Services
             }
 
             return placedTiles;
+        }
+
+        private int GetHardMinimumFreePoints()
+        {
+            int hardDifficultyMinimumFreePoints = 0;
+
+            do
+            {
+                TileSetSearchResponse searchResult = GetTilesByFreePoints(hardDifficultyMinimumFreePoints);
+                if (searchResult.IsTileSetFound)
+                {
+                    return hardDifficultyMinimumFreePoints;
+                }
+                
+                hardDifficultyMinimumFreePoints++;
+            } while (true);
         }
     }
 }

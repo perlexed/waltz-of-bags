@@ -1,28 +1,44 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Enums;
+using Services;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class TimelineController : MonoBehaviour
 {
-    public BagController[] bags;
+    
     public bool isRunning = true;
     public Text victoryText;
     public Text continueText;
     public Text quitText;
     public InteractionManager interactionManager;
+    public DifficultyEnum defaultDifficulty;
 
     public float victoryWaitTime = 1f;
     private float _victoryTime;
     private bool _isInQuitConfirm;
+    private BagController[] _bags;
+
+    private bool _isFirstUpdate = true;
+
+    private void OnFirstUpdate()
+    {
+        GetComponent<LevelManager>().CreateRandomLevel(defaultDifficulty);
+    }
+
+    public void InitBags(BagController[] bags)
+    {
+        _bags = bags;
+    }
 
     public void RefreshBagsState()
     {
         bool areBagsOnShelf = true;
 
-        foreach (BagController bagController in bags)
+        foreach (BagController bagController in _bags)
         {
             if (!bagController.isOnShelf)
             {
@@ -49,7 +65,7 @@ public class TimelineController : MonoBehaviour
 
     public void Reset()
     {
-        foreach (BagController bagController in bags)
+        foreach (BagController bagController in _bags)
         {
             bagController.PlaceOnCart();
         }
@@ -93,6 +109,12 @@ public class TimelineController : MonoBehaviour
 
     private void Update()
     {
+        if (_isFirstUpdate)
+        {
+            OnFirstUpdate();
+            _isFirstUpdate = false;
+        }
+        
         if (Input.GetButtonUp("Cancel"))
         {
             QuitCheck();
