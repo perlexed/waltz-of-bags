@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Enums;
+using GameplayModule;
 using UnityEngine;
 using Grid = GridModule.Models.Grid;
 using GridPoint = GridModule.Models.GridPoint;
