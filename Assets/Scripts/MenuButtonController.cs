@@ -23,7 +23,7 @@ public class MenuButtonController : MonoBehaviour
                 Application.Quit();
                 break;
             case ButtonTypeEnum.ResetBags:
-                timelineController.Reset();
+                timelineController.ReturnBagsOnCart();
                 break;
         }
     }

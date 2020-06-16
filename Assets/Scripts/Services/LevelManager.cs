@@ -26,15 +26,9 @@ namespace Services
 
         private Dictionary<string, GameObject> _tileToBagMap;
         private List<Grid> _grids;
+        public List<GameObject> generatedGridElements;
 
         private static readonly System.Random Rnd = new System.Random();
-
-        private static readonly int[,] DefaultLevelGrid = {
-            {0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0},
-            {1, 1, 1, 1, 1, 1},
-            {0, 0, 0, 0, 0, 0},
-        };
 
         private void Start()
         {
@@ -53,7 +47,7 @@ namespace Services
             _grids = GetInitializedGrids();
         }
 
-        public Grid GetRandomGrid()
+        private Grid GetRandomGrid()
         {
             return _grids[Rnd.Next(_grids.Count)];
         }
@@ -63,19 +57,19 @@ namespace Services
             return new List<Grid>
             {
                 new Grid(new [,] {
-                    {0, 0, 0, 0, 0, 1},
-                    {0, 0, 0, 0, 0, 1},
+                    {0, 0, 0, 0, 1, 0},
+                    {0, 1, 0, 0, 0, 0},
                     {1, 1, 1, 1, 1, 1},
-                    {0, 0, 0, 0, 0, 1},
+                    {1, 1, 0, 0, 0, 0},
                 }),
                 new Grid(new[,] {
-                    {0, 0, 0, 0, 0, 0},
-                    {0, 0, 0, 0, 0, 0},
+                    {0, 0, 1, 0, 0, 0},
+                    {0, 0, 1, 0, 0, 0},
                     {1, 1, 1, 1, 1, 1},
-                    {0, 0, 0, 0, 0, 0},
+                    {0, 0, 0, 1, 0, 0},
                 }),
                 new Grid(new [,] {
-                    {0, 0, 0, 0, 0, 0},
+                    {0, 1, 0, 0, 1, 0},
                     {0, 0, 0, 0, 0, 0},
                 }),
                 new Grid(new [,] {
@@ -95,6 +89,8 @@ namespace Services
             GenerateShelfGrid(grid);
             
             TileSetSearchResponse response = GridTilingService.GetTilesForGrid(grid, difficulty);
+            
+            grid.Reset();
             
             GenerateBags(response.TileSet);
         }
@@ -125,6 +121,8 @@ namespace Services
 
         private void GenerateShelfGrid(Grid grid)
         {
+            generatedGridElements = new List<GameObject>();
+            
             foreach (GridPoint point in grid.GetEmptyPoints())
             {
                 Vector2 containerPosition = gridContainer.transform.position;
@@ -132,6 +130,7 @@ namespace Services
                     
                 GameObject gridElement = Instantiate(gridElementPrefab, gridElementPosition, gridContainer.transform.rotation, gridContainer.transform);
                 gridElement.GetComponent<GridElementController>().interactionManager = _interactionManager;
+                generatedGridElements.Add(gridElement);
             }
         }
     }

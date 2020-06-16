@@ -15,18 +15,28 @@ public class TimelineController : MonoBehaviour
     public Text continueText;
     public Text quitText;
     public InteractionManager interactionManager;
-    public DifficultyEnum defaultDifficulty;
+    public DifficultyEnum difficulty;
 
     public float victoryWaitTime = 1f;
     private float _victoryTime;
     private bool _isInQuitConfirm;
     private BagController[] _bags;
 
-    private bool _isFirstUpdate = true;
+    private LevelManager _levelManager;
 
-    private void OnFirstUpdate()
+    private bool _isFirstUpdate = true;
+    private bool _shouldRefreshBagsOnUpdate = false;
+
+    private void Start()
     {
-        GetComponent<LevelManager>().CreateRandomLevel(defaultDifficulty);
+        _levelManager = gameObject.GetComponent<LevelManager>();
+    }
+
+    private void CreateLevel()
+    {
+        _levelManager.CreateRandomLevel(difficulty);
+
+        _shouldRefreshBagsOnUpdate = true;
     }
 
     public void InitBags(BagController[] bags)
@@ -52,6 +62,19 @@ public class TimelineController : MonoBehaviour
         }
     }
 
+    private void ClearCreatedInstances()
+    {
+        foreach (BagController bag in _bags)
+        {
+            Destroy(bag.gameObject);
+        }
+
+        foreach (GameObject generatedGridElement in _levelManager.generatedGridElements)
+        {
+            Destroy(generatedGridElement);
+        }
+    }
+
     private void SetVictory()
     {
         gameObject.GetComponent<AudioSource>().Play();
@@ -63,13 +86,23 @@ public class TimelineController : MonoBehaviour
         victoryText.gameObject.SetActive(true);
     }
 
-    public void Reset()
+    public void ReturnBagsOnCart()
     {
         foreach (BagController bagController in _bags)
         {
             bagController.PlaceOnCart();
         }
+    }
 
+    public void ClearLevelAndStartNew()
+    {
+        ClearCreatedInstances();
+        
+        CreateLevel();
+    }
+
+    private void ResumeAfterVictory()
+    {
         isRunning = true;
         victoryText.gameObject.SetActive(false);
         continueText.gameObject.SetActive(false);
@@ -109,10 +142,19 @@ public class TimelineController : MonoBehaviour
 
     private void Update()
     {
+        // Create level after in the first Update frame (after all game objects had started)
         if (_isFirstUpdate)
         {
-            OnFirstUpdate();
+            CreateLevel();
             _isFirstUpdate = false;
+        }
+
+        if (_shouldRefreshBagsOnUpdate)
+        {
+            foreach (BagController bag in _bags)
+            {
+                bag.RefreshGridElements();
+            }
         }
         
         if (Input.GetButtonUp("Cancel"))
@@ -129,7 +171,8 @@ public class TimelineController : MonoBehaviour
 
             if (Input.GetButtonDown("Fire1"))
             {
-                Reset();
+                ClearLevelAndStartNew();
+                ResumeAfterVictory();
             }
         }
     }

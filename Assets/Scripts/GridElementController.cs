@@ -11,6 +11,11 @@ public class GridElementController : MonoBehaviour
 
     public InteractionManager interactionManager;
 
+    private void OnDestroy()
+    {
+        interactionManager.OnCarryingStatusChangeEvent -= OnIsDraggingStatusChange;
+    }
+
     public void Start()
     {
         interactionManager.OnCarryingStatusChangeEvent += OnIsDraggingStatusChange;
