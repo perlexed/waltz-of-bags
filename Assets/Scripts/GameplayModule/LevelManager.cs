@@ -7,10 +7,11 @@ using UnityEngine;
 using Grid = GridModule.Models.Grid;
 using GridPoint = GridModule.Models.GridPoint;
 using Tile = GridModule.Models.Tile;
+using Services;
 
 using TileSetSearchResponse = Services.GridTilingService.TileSetSearchResponse;
 
-namespace Services
+namespace GameplayModule
 {
     public class LevelManager : MonoBehaviour
     {
