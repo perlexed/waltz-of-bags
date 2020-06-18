@@ -90,11 +90,11 @@ namespace GameplayModule
         {
             GenerateShelfGrid(grid);
             
-            TileSetSearchResponse response = GridTilingService.GetTilesForGrid(grid, difficulty);
+            List<Tile> tiles = GridTilingService.GetTilesForGrid(grid, difficulty);
             
             grid.Reset();
             
-            GenerateBags(response.TileSet);
+            GenerateBags(tiles);
         }
 
         private void GenerateBags(List<Tile> tiles)

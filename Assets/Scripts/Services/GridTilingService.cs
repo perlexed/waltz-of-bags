@@ -69,14 +69,14 @@ namespace Services
             new Tile { Height = 2, Width = 1 },
         };
 
-        public static TileSetSearchResponse GetTilesForGrid(Grid grid, DifficultyEnum difficulty)
+        public static List<Tile> GetTilesForGrid(Grid grid, DifficultyEnum difficulty)
         {
             return (new GridTilingService(grid, difficulty)).GetTiles();
         }
 
-        private TileSetSearchResponse GetTiles()
+        private List<Tile> GetTiles()
         {
-            return GetTilesByFreePoints(_freePointsByDifficulty[_difficulty]);
+            return GetTilesByFreePoints(_freePointsByDifficulty[_difficulty]).TileSet;
         }
         
         private TileSetSearchResponse GetTilesByFreePoints(int targetEmptyFreePointsCount)
@@ -87,7 +87,7 @@ namespace Services
             do
             {
                 _grid.Reset();
-                tileSet = GetTileSet();
+                tileSet = GetTileSetForTileTypes();
                 gridGenerationCount++;
                 // Debug.Log(_grid);
                 // Debug.Log($"Tiles ({tileSet.Count}): " + string.Join(", ", tileSet));
@@ -108,7 +108,7 @@ namespace Services
             };
         }
 
-        private List<Tile> GetTileSet()
+        private List<Tile> GetTileSetForTileTypes()
         {
             List<TileData> availableTiles = new List<TileData>();
             foreach (var tile in _tiles)
