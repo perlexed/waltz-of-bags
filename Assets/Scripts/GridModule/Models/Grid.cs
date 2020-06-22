@@ -13,20 +13,31 @@ namespace GridModule.Models
 
         private readonly int[,] _sourceGrid;
 
-        public bool isVerbose;
-
+        /**
+         * Create empty grid with the given width and height
+         */
+        public Grid(int width, int height)
+        {
+            int[,] grid = new int[height, width];
+            
+            _grid = grid.Clone() as int[,];
+            _sourceGrid = grid.Clone() as int[,];
+        }
+        
         public Grid(int[,] grid)
         {
             _grid = grid.Clone() as int[,];
             _sourceGrid = grid.Clone() as int[,];
         }
 
+        public Grid Clone()
+        {
+            return new Grid(_grid.Clone() as int[,]);
+        }
+
         private void Log(string logString)
         {
-            if (isVerbose)
-            {
-                Debug.Log(logString);
-            }
+            // Debug.Log(logString);
         }
 
         public void Reset()
@@ -34,11 +45,11 @@ namespace GridModule.Models
             _grid = _sourceGrid.Clone() as int[,];
         }
 
-        public int Width => _grid.GetLength(1);
+        private int Width => _grid.GetLength(1);
 
-        public int Height => _grid.GetLength(0);
+        private int Height => _grid.GetLength(0);
 
-        public int PointsCount => Height * Width;
+        private int PointsCount => Height * Width;
 
         public int FreePointsCount
         {
@@ -49,7 +60,7 @@ namespace GridModule.Models
                 for (int y = 0; y < Height; y += 1)
                 {
                     for (int x = 0; x < Width; x += 1) {
-                        if (_grid[y, x] == 0)
+                        if (GetAt(x, y) == 0)
                         {
                             freePointsCount++;
                         }
@@ -58,6 +69,16 @@ namespace GridModule.Models
 
                 return freePointsCount;
             }
+        }
+
+        private int GetAt(int x, int y)
+        {
+            return _grid[y, x];
+        }
+
+        private void SetAt(int x, int y, int value)
+        {
+            _grid[y, x] = value;
         }
 
         public override string ToString()
@@ -70,7 +91,7 @@ namespace GridModule.Models
                 List<int> rowValues = new List<int>();
                 
                 for (int x = 0; x < Width; x += 1) {
-                    rowValues.Add(_grid[y, x]);
+                    rowValues.Add(GetAt(x, y));
                 }
                 
                 rows.Add(string.Join("\t", rowValues));
@@ -100,9 +121,9 @@ namespace GridModule.Models
                         return false;
                     }
 
-                    if (_grid[tileYPosition, tileXPosition] > 0)
+                    if (GetAt(tileXPosition, tileYPosition) > 0)
                     {
-                        Log($"Tile x = {tileXPosition}, y = {tileYPosition} is not empty: {_grid[tileYPosition, tileXPosition]}");
+                        Log($"Tile x = {tileXPosition}, y = {tileYPosition} is not empty: {GetAt(tileXPosition, tileYPosition)}");
                         return false;
                     }
                 }
@@ -125,7 +146,7 @@ namespace GridModule.Models
                     int tileYPosition = y + point.Y;
                     int tileXPosition = x + point.X;
 
-                    _grid[tileYPosition, tileXPosition] = 1;
+                    SetAt(tileXPosition, tileYPosition, 1);
                 }
             }
 
@@ -156,7 +177,7 @@ namespace GridModule.Models
             for (int y = 0; y < Height; y += 1)
             {
                 for (int x = 0; x < Width; x += 1) {
-                    if (_grid[y, x] == 0)
+                    if (GetAt(x, y) == 0)
                     {
                         emptyPoints.Add(new GridPoint{X = x, Y = y});
                     }

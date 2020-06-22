@@ -2,9 +2,17 @@
 
 namespace GridModule.Models
 {
-    public struct TileData
+    public class TileData
     {
         public Tile Tile;
         public List<GridPoint> AvailablePoints;
+        public bool IsPlaced;
+        public GridPoint Coordinates;
+
+        public void SetPlacedPoint(GridPoint coordinates)
+        {
+            IsPlaced = true;
+            Coordinates = coordinates;
+        }
     }
 }

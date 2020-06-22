@@ -2,19 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using Enums;
-using GameplayModule;
 using UnityEngine;
 using Grid = GridModule.Models.Grid;
 using GridPoint = GridModule.Models.GridPoint;
 using Tile = GridModule.Models.Tile;
-using Services;
-
-using TileSetSearchResponse = Services.GridTilingService.TileSetSearchResponse;
+using TileData = GridModule.Models.TileData;
+using GridModule.Services;
 
 namespace GameplayModule
 {
     public class LevelManager : MonoBehaviour
     {
+        public int cartGridWidth;
+        
         public GameObject gridContainer;
         public GameObject gridElementPrefab;
 
@@ -23,12 +23,13 @@ namespace GameplayModule
         public GameObject bag2X2Prefab;
         public GameObject luggageCart;
 
+        public List<GameObject> generatedGridElements;
+
         private InteractionManager _interactionManager;
         private TimelineController _timelineController;
 
         private Dictionary<string, GameObject> _tileToBagMap;
         private List<Grid> _grids;
-        public List<GameObject> generatedGridElements;
 
         private static readonly System.Random Rnd = new System.Random();
 
@@ -92,33 +93,49 @@ namespace GameplayModule
             
             List<Tile> tiles = GridTilingService.GetTilesForGrid(grid, difficulty);
             
-            grid.Reset();
+            List<TileData> arrangedTiles = TilesCombinatorService.PlaceTilesOnCart(tiles, cartGridWidth);
             
-            GenerateBags(tiles);
+            GenerateBags(arrangedTiles);
         }
 
-        private void GenerateBags(List<Tile> tiles)
+        private void GenerateBags(List<TileData> tiles)
         {
-            List<BagController> createdBags = new List<BagController>();            
-
-            foreach (Tile tile in tiles)
-            {
-                GameObject bagPrefab = _tileToBagMap[tile.GetStringHash()];
-
-                GameObject bagGameObject = Instantiate(bagPrefab, luggageCart.transform.position,
-                    luggageCart.transform.rotation, luggageCart.transform);
-
-                BagController bag = bagGameObject.GetComponent<BagController>();
-
-                bag.shelfGrid = gridContainer;
-                bag.interactionManager = _interactionManager;
-                bag.timelineController = _timelineController;
-                bag.RefreshGridElements();
-                
-                createdBags.Add(bag);
-            }
-
+            List<BagController> createdBags = tiles.ConvertAll(CreateBagByTile);            
             _timelineController.InitBags(createdBags.ToArray());
+        }
+
+        private BagController CreateBagByTile(TileData gridTile)
+        {
+            GameObject bagPrefab = _tileToBagMap[gridTile.Tile.GetStringHash()];
+
+            // We calculated tile positions with the coordinator on it's top left point
+            // so we need to offset this bag by it's width/height 
+            Vector2 bagAddition = new Vector2(
+                (gridTile.Tile.Width - 1) / 2f,
+                (gridTile.Tile.Height - 1) / 2f
+            );
+            Vector2 bagCoordinates = (Vector2) luggageCart.transform.position + gridTile.Coordinates.ToVector() + bagAddition;
+
+            GameObject bagGameObject = Instantiate(
+                bagPrefab,
+                bagCoordinates,
+                bagPrefab.transform.rotation,
+                luggageCart.transform
+            );
+
+            if (gridTile.Tile.isVertical)
+            {
+                bagGameObject.transform.Rotate(new Vector3(0, 0, -90));
+            }
+                
+            BagController bag = bagGameObject.GetComponent<BagController>();
+
+            bag.shelfGrid = gridContainer;
+            bag.interactionManager = _interactionManager;
+            bag.timelineController = _timelineController;
+            bag.RefreshGridElements();
+
+            return bag;
         }
 
         private void GenerateShelfGrid(Grid grid)
@@ -127,10 +144,16 @@ namespace GameplayModule
             
             foreach (GridPoint point in grid.GetEmptyPoints())
             {
-                Vector2 containerPosition = gridContainer.transform.position;
-                Vector2 gridElementPosition = new Vector2(point.X + containerPosition.x, -1 * point.Y + containerPosition.y);
+                // Mirror grid point down because we're making it grow downward
+                Vector2 pointVector = point.ToVector() * new Vector2(1, -1);
                     
-                GameObject gridElement = Instantiate(gridElementPrefab, gridElementPosition, gridContainer.transform.rotation, gridContainer.transform);
+                GameObject gridElement = Instantiate(
+                    gridElementPrefab,
+                    (Vector2) gridContainer.transform.position + pointVector,
+                    gridContainer.transform.rotation,
+                    gridContainer.transform
+                );
+                
                 gridElement.GetComponent<GridElementController>().interactionManager = _interactionManager;
                 generatedGridElements.Add(gridElement);
             }

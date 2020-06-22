@@ -5,14 +5,18 @@
         public int Width;
         public int Height;
 
+        public int Square => Width * Height;
+
         public override string ToString()
         {
-            return $"[{Height}, {Width}]";
+            return $"[{Width}, {Height}]";
         }
 
         public string GetStringHash()
         {
-            return $"{Height}X{Width}";
+            return $"{Width}X{Height}";
         }
+
+        public bool isVertical => Height > Width;
     }
 }
