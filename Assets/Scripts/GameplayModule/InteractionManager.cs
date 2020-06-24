@@ -5,7 +5,7 @@ namespace GameplayModule
     public class InteractionManager : MonoBehaviour
     {
         public bool allowInteractions = true;
-        public bool _isCarryingBag = false;
+        private bool _isCarryingBag;
 
         public delegate void OnCarryingStatusChange(bool newValue);
 
@@ -13,13 +13,13 @@ namespace GameplayModule
 
         public bool IsCarryingBag
         {
-            get { return _isCarryingBag; }
+            get => _isCarryingBag;
             set
             {
                 if (_isCarryingBag != value)
                 {
                     _isCarryingBag = value;
-                    OnCarryingStatusChangeEvent(value);
+                    OnCarryingStatusChangeEvent?.Invoke(value);
                 }
             }
         }

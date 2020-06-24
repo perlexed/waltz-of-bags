@@ -133,6 +133,7 @@ namespace GameplayModule
             bag.shelfGrid = gridContainer;
             bag.interactionManager = _interactionManager;
             bag.timelineController = _timelineController;
+            bag.isOnCart = true;
             bag.RefreshGridElements();
 
             return bag;

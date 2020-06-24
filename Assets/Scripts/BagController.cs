@@ -8,6 +8,7 @@ using UnityEngine;
 public class BagController : MonoBehaviour
 {
     public bool isOnShelf;
+    public bool isOnCart;
     public bool canBeRotated;
 
     public Color defaultColor = new Color(1, 1, 1, 1);
@@ -42,6 +43,9 @@ public class BagController : MonoBehaviour
     private Collider2D[] _gridElements;
 
     private List<GridElementController> _matchedGridElements = new List<GridElementController>();
+
+    public delegate void OnBagPickupStatusChange();
+    public event OnBagPickupStatusChange OnBagPickupStatusChangeEvent;
 
     void Start()
     {
@@ -141,6 +145,7 @@ public class BagController : MonoBehaviour
         }
         
         isOnShelf = false;
+        isOnCart = false;
         
         SetReadinessToBePlaced(CanBePlaced());
 
@@ -155,6 +160,8 @@ public class BagController : MonoBehaviour
         _matchedGridElements = new List<GridElementController>();
 
         SpriteHelper.SetAlpha(_spriteRenderer.color, 0.5f);
+
+        OnBagPickupStatusChangeEvent?.Invoke();
     }
 
     private void SetShelfSpaceFree()
@@ -197,12 +204,15 @@ public class BagController : MonoBehaviour
         
         transform.position = _startingPosition;
         isOnShelf = false;
+        isOnCart = true;
+        
+        OnBagPickupStatusChangeEvent?.Invoke();
     }
 
     void PlaceOfShelf()
     {
         isOnShelf = true;
-        timelineController.RefreshBagsState();
+        isOnCart = false;
 
         foreach (GridElementController gridElement in _matchedGridElements)
         {
@@ -211,6 +221,8 @@ public class BagController : MonoBehaviour
 
         // Position bag on grid
         transform.position += _nearestGridOffset;
+        
+        OnBagPickupStatusChangeEvent?.Invoke();
     }
 
     void Update()

@@ -1,4 +1,5 @@
-﻿using Enums;
+﻿using System.Linq;
+using Enums;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,6 +14,7 @@ namespace GameplayModule
         public Text quitText;
         public InteractionManager interactionManager;
         public DifficultyEnum difficulty;
+        public Button ResetBagsButton;
 
         public float victoryWaitTime = 1f;
         private float _victoryTime;
@@ -22,7 +24,15 @@ namespace GameplayModule
         private LevelManager _levelManager;
 
         private bool _isFirstUpdate = true;
-        private bool _shouldRefreshBagsOnUpdate = false;
+        private bool _shouldRefreshBagsOnUpdate;
+
+        private bool AreAllBagsOnCart => _bags
+            .ToList()
+            .Aggregate(true, (areAllBagsOnCart, bag) => areAllBagsOnCart && bag.isOnCart);
+        
+        private bool AreAllBagsOnShelf => _bags
+            .ToList()
+            .Aggregate(true, (areAllBagsOnCart, bag) => areAllBagsOnCart && bag.isOnShelf);
 
         private void Start()
         {
@@ -39,24 +49,21 @@ namespace GameplayModule
         public void InitBags(BagController[] bags)
         {
             _bags = bags;
+            
+            foreach (var bag in _bags)
+            {
+                bag.OnBagPickupStatusChangeEvent += OnBagPickupStatusChange;
+            }
         }
 
-        public void RefreshBagsState()
+        private void OnBagPickupStatusChange()
         {
-            bool areBagsOnShelf = true;
-
-            foreach (BagController bagController in _bags)
-            {
-                if (!bagController.isOnShelf)
-                {
-                    areBagsOnShelf = false;
-                }
-            }
-
-            if (areBagsOnShelf)
+            if (AreAllBagsOnShelf)
             {
                 SetVictory();
             }
+            
+            ResetBagsButton.interactable = !AreAllBagsOnCart;
         }
 
         private void ClearCreatedInstances()
@@ -118,6 +125,11 @@ namespace GameplayModule
             }
         }
 
+        public void QuitApplication()
+        {
+            Application.Quit();
+        }
+
         private void CancelQuitCheck()
         {
             quitText.gameObject.SetActive(false);
@@ -129,7 +141,7 @@ namespace GameplayModule
         {
             if (_isInQuitConfirm)
             {
-                Application.Quit();
+                QuitApplication();
             }
             else
             {
