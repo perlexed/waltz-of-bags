@@ -7,9 +7,8 @@ namespace GameplayModule
 {
     public class TimelineController : MonoBehaviour
     {
-    
         public bool isRunning = true;
-        public Text victoryText;
+        public GameObject victoryPanel;
         public Text continueText;
         public Text quitText;
         public InteractionManager interactionManager;
@@ -87,7 +86,7 @@ namespace GameplayModule
             _victoryTime = Time.time;
             interactionManager.allowInteractions = false;
 
-            victoryText.gameObject.SetActive(true);
+            victoryPanel.SetActive(true);
             
             gameObject.GetComponent<VictoriesCountManager>().OnVictory();
         }
@@ -110,7 +109,7 @@ namespace GameplayModule
         private void ResumeAfterVictory()
         {
             isRunning = true;
-            victoryText.gameObject.SetActive(false);
+            victoryPanel.SetActive(false);
             continueText.gameObject.SetActive(false);
 
             interactionManager.allowInteractions = true;
@@ -125,11 +124,6 @@ namespace GameplayModule
             }
         }
 
-        public void QuitApplication()
-        {
-            Application.Quit();
-        }
-
         private void CancelQuitCheck()
         {
             quitText.gameObject.SetActive(false);
@@ -141,7 +135,7 @@ namespace GameplayModule
         {
             if (_isInQuitConfirm)
             {
-                QuitApplication();
+                Application.Quit();
             }
             else
             {

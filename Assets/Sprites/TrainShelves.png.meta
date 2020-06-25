@@ -4,7 +4,13 @@ TextureImporter:
   internalIDToNameTable:
   - first:
       213: 3541686512460173184
-    second: TrainShelves_0
+    second: cart
+  - first:
+      213: 5903738819121137587
+    second: shelves
+  - first:
+      213: -6544822965594926789
+    second: wall_left
   externalObjects: {}
   serializedVersion: 10
   mipmaps:
@@ -89,15 +95,15 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: TrainShelves_0
+      name: cart
       rect:
         serializedVersion: 2
-        x: 0
-        y: 4
-        width: 1671
-        height: 917
+        x: 107
+        y: 8
+        width: 610
+        height: 485
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -105,6 +111,48 @@ TextureImporter:
       bones: []
       spriteID: 1c89167f893022c4398484e00b96bd1b
       internalID: 3541686512460173184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: shelves
+      rect:
+        serializedVersion: 2
+        x: 753
+        y: 0
+        width: 1570
+        height: 755
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fc2e128a3885de343bd495ef01885dbb
+      internalID: 5903738819121137587
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: wall_left
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 80
+        height: 921
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a7dc60fa11e7b04a825f8674931ff0e
+      internalID: -6544822965594926789
       vertices: []
       indices: 
       edges: []
