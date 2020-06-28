@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: -2429766845941678623}
   - component: {fileID: 8951780210241057455}
   - component: {fileID: 494736371191388969}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: GridElement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -69,8 +69,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -894139889
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -132,3 +132,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 299690d0a2984c143b2d7f11800394f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isOccupied: 0
+  interactionManager: {fileID: 0}

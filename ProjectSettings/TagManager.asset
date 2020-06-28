@@ -13,7 +13,7 @@ TagManager:
   - UI
   - 
   - 
-  - 
+  - Bags
   - 
   - 
   - 
@@ -43,6 +43,9 @@ TagManager:
     locked: 0
   - name: background
     uniqueID: 2024396357
+    locked: 0
+  - name: grid_elements
+    uniqueID: 3400827407
     locked: 0
   - name: bags
     uniqueID: 210036711
