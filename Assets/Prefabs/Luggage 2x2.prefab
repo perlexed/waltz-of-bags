@@ -34,7 +34,7 @@ Transform:
   m_Father: {fileID: 3170543306135755548}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &8373052677185446848
+--- !u!1 &7716498317446423026
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,40 +42,36 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3170543306135755548}
-  - component: {fileID: 6850512805536860824}
-  - component: {fileID: -7325757576983455201}
-  - component: {fileID: 4196646774127102042}
-  - component: {fileID: -2939048449085863077}
+  - component: {fileID: 2198807451655839183}
+  - component: {fileID: 7077033007204947203}
   m_Layer: 0
-  m_Name: Luggage 2x2
+  m_Name: BagSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3170543306135755548
+--- !u!4 &2198807451655839183
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8373052677185446848}
+  m_GameObject: {fileID: 7716498317446423026}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 3029902838722960055}
-  m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_Children: []
+  m_Father: {fileID: 3170543306135755548}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &6850512805536860824
+--- !u!212 &7077033007204947203
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8373052677185446848}
+  m_GameObject: {fileID: 7716498317446423026}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -104,21 +100,56 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 210036711
-  m_SortingLayer: 3
-  m_SortingOrder: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
   m_Sprite: {fileID: 7104712391880876718, guid: f7c6f3d623fcd61449e93046c08a204f,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 3.36, y: 1.15}
+  m_Size: {x: 1.81, y: 1.76}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &8373052677185446848
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3170543306135755548}
+  - component: {fileID: -7325757576983455201}
+  - component: {fileID: 4196646774127102042}
+  - component: {fileID: -2939048449085863077}
+  m_Layer: 0
+  m_Name: Luggage 2x2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3170543306135755548
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8373052677185446848}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3029902838722960055}
+  - {fileID: 2198807451655839183}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &-7325757576983455201
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -145,6 +176,7 @@ MonoBehaviour:
   shelfGrid: {fileID: 0}
   timelineController: {fileID: 0}
   interactionManager: {fileID: 0}
+  SpriteRenderer: {fileID: 7077033007204947203}
   outlineMaterial: {fileID: 2100000, guid: 4934359340f01354789d32e59bd3d77a, type: 2}
   normalMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   pickupSound: {fileID: 8300000, guid: f04149a0d4ffc4f44af30a20c90e6bd2, type: 3}
