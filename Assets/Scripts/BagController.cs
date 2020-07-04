@@ -19,7 +19,7 @@ public class BagController : MonoBehaviour
     public GameObject shelfGrid;
     public TimelineController timelineController;
     public InteractionManager interactionManager;
-    public SpriteRenderer SpriteRenderer;
+    public SpriteRenderer[] spriteRenderers;
 
     public Material outlineMaterial;
     public Material normalMaterial;
@@ -41,17 +41,22 @@ public class BagController : MonoBehaviour
     private Camera _camera;
     private AudioSource _audioSource;
     private Collider2D[] _gridElements;
+    private SpriteRenderer _spriteRenderer;
 
     private List<GridElementController> _matchedGridElements = new List<GridElementController>();
 
     public delegate void OnBagPickupStatusChange();
     public event OnBagPickupStatusChange OnBagPickupStatusChangeEvent;
 
+    private static readonly System.Random Rnd = new System.Random();
+
     void Start()
     {
         _camera = Camera.main;
         _startingPosition = transform.position;
         _audioSource = gameObject.GetComponent<AudioSource>();
+        _spriteRenderer = spriteRenderers[Rnd.Next(spriteRenderers.Length)];
+        _spriteRenderer.gameObject.SetActive(true);
     }
 
     public void RefreshGridElements()
@@ -118,19 +123,19 @@ public class BagController : MonoBehaviour
         }
         else
         {
-            SpriteRenderer.color = wrongPlaceColor;
+            _spriteRenderer.color = wrongPlaceColor;
             StartCoroutine(FlashBagOnWrongPlaceDrop());
         }
     }
 
     public void OnMouseOver()
     {
-        SpriteRenderer.material = outlineMaterial;
+        _spriteRenderer.material = outlineMaterial;
     }
 
     public void OnMouseExit()
     {
-        SpriteRenderer.material = normalMaterial;
+        _spriteRenderer.material = normalMaterial;
     }
 
     private void StartDragging()
@@ -150,7 +155,7 @@ public class BagController : MonoBehaviour
 
         interactionManager.IsCarryingBag = true;
         _isDragging = true;
-        SpriteRenderer.sortingLayerID = SortingLayer.NameToID(SortingLayerDraggedBag);
+        _spriteRenderer.sortingLayerID = SortingLayer.NameToID(SortingLayerDraggedBag);
 
         foreach (GridElementController gridElement in _matchedGridElements)
         {
@@ -158,7 +163,7 @@ public class BagController : MonoBehaviour
         }
         _matchedGridElements = new List<GridElementController>();
 
-        SpriteHelper.SetAlpha(SpriteRenderer.color, 0.5f);
+        SpriteHelper.SetAlpha(_spriteRenderer.color, 0.5f);
 
         OnBagPickupStatusChangeEvent?.Invoke();
     }
@@ -175,13 +180,13 @@ public class BagController : MonoBehaviour
     private void StopDragging(bool isPlacedOnShelf)
     {
         _isDragging = false;
-        SpriteRenderer.sortingLayerID = SortingLayer.NameToID(SortingLayerBags);
+        _spriteRenderer.sortingLayerID = SortingLayer.NameToID(SortingLayerBags);
 
         SetReadinessToBePlaced(false);
 
         interactionManager.IsCarryingBag = false;
 
-        SpriteHelper.SetAlpha(SpriteRenderer.color, 1);
+        SpriteHelper.SetAlpha(_spriteRenderer.color, 1);
 
         if (isPlacedOnShelf)
         {
@@ -277,16 +282,16 @@ public class BagController : MonoBehaviour
 
     private void SetReadinessToBePlaced(bool canBePlaced)
     {
-        SpriteRenderer.color = canBePlaced ? canBePlacedColor : defaultColor;
+        _spriteRenderer.color = canBePlaced ? canBePlacedColor : defaultColor;
     }
 
     private IEnumerator FlashBagOnWrongPlaceDrop()
     {
         yield return new WaitForSeconds(1);
         
-        if (SpriteRenderer.color == wrongPlaceColor)
+        if (_spriteRenderer.color == wrongPlaceColor)
         {
-            SpriteRenderer.color = defaultColor;
+            _spriteRenderer.color = defaultColor;
         }
     }
 }
