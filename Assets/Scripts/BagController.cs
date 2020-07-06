@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Enums;
 using GameplayModule;
 using Helpers;
 using UnityEngine;
@@ -104,6 +105,11 @@ public class BagController : MonoBehaviour
         return canBagBePlaced;
     }
 
+    private bool CanBeMoved()
+    {
+        return !isOnShelf || timelineController.difficulty != DifficultyEnum.Hard;
+    }
+
     public void OnMouseDown()
     {
         if (!interactionManager.allowInteractions)
@@ -113,7 +119,7 @@ public class BagController : MonoBehaviour
         
         if (!_isDragging)
         {
-            if (!interactionManager.IsCarryingBag)
+            if (CanBeMoved())
             {
                 StartDragging();
             }
@@ -130,7 +136,10 @@ public class BagController : MonoBehaviour
 
     public void OnMouseOver()
     {
-        _spriteRenderer.material = outlineMaterial;
+        if (CanBeMoved())
+        {
+            _spriteRenderer.material = outlineMaterial;
+        }
     }
 
     public void OnMouseExit()
