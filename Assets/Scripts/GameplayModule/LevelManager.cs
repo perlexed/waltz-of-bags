@@ -128,8 +128,15 @@ namespace GameplayModule
             GenerateShelfGrid(grid);
             
             List<Tile> tiles = GridTilingService.GetTilesForGrid(grid, difficulty);
+
+            // Randomly rotate tiles than can be rotated to get a little variety at bags positions at the cart 
+            List<Tile> randomlyRotatedTiles = tiles.ConvertAll(
+                tile => tile.CanBeRotated() && (Rnd.Next(2) == 1)
+                    ? new Tile{Height = tile.Width, Width = tile.Height}
+                    : tile 
+            );
             
-            List<TileData> arrangedTiles = TilesCombinatorService.PlaceTilesOnCart(tiles, cartGridWidth);
+            List<TileData> arrangedTiles = TilesCombinatorService.PlaceTilesOnCart(randomlyRotatedTiles, cartGridWidth);
             
             GenerateBags(arrangedTiles);
         }

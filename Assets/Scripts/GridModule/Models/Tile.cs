@@ -18,5 +18,10 @@
         }
 
         public bool isVertical => Height > Width;
+
+        public bool CanBeRotated()
+        {
+            return Height != Width;
+        }
     }
 }
