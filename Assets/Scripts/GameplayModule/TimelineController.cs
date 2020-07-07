@@ -10,7 +10,6 @@ namespace GameplayModule
         public bool isRunning = true;
         public GameObject victoryPanel;
         public Text continueText;
-        public Text quitText;
         public InteractionManager interactionManager;
         public DifficultyEnum difficulty;
         public Button ResetBagsButton;
@@ -115,34 +114,9 @@ namespace GameplayModule
             interactionManager.allowInteractions = true;
         }
 
-        void OnGUI()
+        public void TogglePause(bool doPause)
         {
-            Event e = Event.current;
-            if (e.isKey && e.keyCode != KeyCode.Escape)
-            {
-                CancelQuitCheck();
-            }
-        }
-
-        private void CancelQuitCheck()
-        {
-            quitText.gameObject.SetActive(false);
-            _isInQuitConfirm = false;
-            interactionManager.allowInteractions = true;
-        }
-    
-        private void QuitCheck()
-        {
-            if (_isInQuitConfirm)
-            {
-                Application.Quit();
-            }
-            else
-            {
-                _isInQuitConfirm = true;
-                quitText.gameObject.SetActive(true);
-                interactionManager.allowInteractions = false;
-            }
+            interactionManager.allowInteractions = !doPause;
         }
 
         private void Update()
@@ -160,11 +134,6 @@ namespace GameplayModule
                 {
                     bag.RefreshGridElements();
                 }
-            }
-        
-            if (Input.GetButtonUp("Cancel"))
-            {
-                QuitCheck();
             }
 
             if (!isRunning && Time.time - _victoryTime >= victoryWaitTime)

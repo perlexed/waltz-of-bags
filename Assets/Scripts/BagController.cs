@@ -36,6 +36,7 @@ public class BagController : MonoBehaviour
     private bool _canBePlaced;
     private bool _isDragging;
     private Vector2 _startingPosition;
+    private Quaternion _startingRotation;
 
     private Vector3 _nearestGridOffset;
 
@@ -55,6 +56,7 @@ public class BagController : MonoBehaviour
     {
         _camera = Camera.main;
         _startingPosition = transform.position;
+        _startingRotation = transform.rotation;
         _audioSource = gameObject.GetComponent<AudioSource>();
         _spriteRenderer = spriteRenderers[Rnd.Next(spriteRenderers.Length)];
         _spriteRenderer.gameObject.SetActive(true);
@@ -216,6 +218,7 @@ public class BagController : MonoBehaviour
         SetShelfSpaceFree();
         
         transform.position = _startingPosition;
+        transform.rotation = _startingRotation;
         isOnShelf = false;
         isOnCart = true;
         
