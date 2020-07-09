@@ -13,10 +13,12 @@ namespace GameplayModule
         public GameObject hardDifficultyButton;
 
         private TimelineController _timelineController;
+        private CommendationsManager _commendationsManager;
 
         private void Start()
         {
             _timelineController = gameObject.GetComponent<TimelineController>();
+            _commendationsManager = gameObject.GetComponent<CommendationsManager>();
             
             normalDifficultyButton.SetActive(_timelineController.difficulty == DifficultyEnum.Hard);
             hardDifficultyButton.SetActive(_timelineController.difficulty == DifficultyEnum.Normal);
@@ -43,6 +45,7 @@ namespace GameplayModule
             hardDifficultyButton.SetActive(difficulty == DifficultyEnum.Normal);
             _timelineController.difficulty = difficulty;
             _timelineController.ClearLevelAndStartNew();
+            _commendationsManager.ResetCommendations();
         }
     }
 }

@@ -87,7 +87,7 @@ namespace GameplayModule
 
             victoryPanel.SetActive(true);
             
-            gameObject.GetComponent<VictoriesCountManager>().OnVictory();
+            gameObject.GetComponent<CommendationsManager>().OnVictory();
         }
 
         public void ReturnBagsOnCart()
