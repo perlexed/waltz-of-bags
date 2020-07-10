@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Enums;
+﻿using Enums;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,15 +24,6 @@ namespace GameplayModule
 
         private bool _isFirstUpdate = true;
         private bool _isSecondUpdate;
-        private bool _shouldRefreshBagsOnUpdate;
-
-        private bool AreAllBagsOnCart => _bags
-            .ToList()
-            .Aggregate(true, (areAllBagsOnCart, bag) => areAllBagsOnCart && bag.isOnCart);
-        
-        private bool AreAllBagsOnShelf => _bags
-            .ToList()
-            .Aggregate(true, (areAllBagsOnCart, bag) => areAllBagsOnCart && bag.isOnShelf);
 
         private void Start()
         {
@@ -44,41 +34,16 @@ namespace GameplayModule
         private void CreateLevel()
         {
             _levelManager.CreateRandomLevel(difficulty);
-
-            _shouldRefreshBagsOnUpdate = true;
         }
 
-        public void InitBags(BagController[] bags)
+        public void OnBagPickupStatusChange(bool areAllBagsOnShelf, bool areAllBagsOnCart)
         {
-            _bags = bags;
-            
-            foreach (var bag in _bags)
-            {
-                bag.OnBagPickupStatusChangeEvent += OnBagPickupStatusChange;
-            }
-        }
-
-        private void OnBagPickupStatusChange()
-        {
-            if (AreAllBagsOnShelf)
+            if (areAllBagsOnShelf)
             {
                 SetVictory();
             }
             
-            ResetBagsButton.interactable = !AreAllBagsOnCart;
-        }
-
-        private void ClearCreatedInstances()
-        {
-            foreach (BagController bag in _bags)
-            {
-                Destroy(bag.gameObject);
-            }
-
-            foreach (GameObject generatedGridElement in _levelManager.generatedGridElements)
-            {
-                Destroy(generatedGridElement);
-            }
+            ResetBagsButton.interactable = !areAllBagsOnCart;
         }
 
         private void SetVictory()
@@ -103,7 +68,7 @@ namespace GameplayModule
 
         public void ClearLevelAndStartNew()
         {
-            ClearCreatedInstances();
+            _levelManager.ClearCreatedInstances();
         
             CreateLevel();
         }
@@ -133,16 +98,6 @@ namespace GameplayModule
             } else if (_isSecondUpdate)
             {
                 loadingText.SetActive(false);
-            }
-
-            if (_shouldRefreshBagsOnUpdate)
-            {
-                foreach (BagController bag in _bags)
-                {
-                    bag.RefreshGridElements();
-                }
-
-                _shouldRefreshBagsOnUpdate = false;
             }
 
             if (!isRunning && Time.time - _victoryTime >= victoryWaitTime)

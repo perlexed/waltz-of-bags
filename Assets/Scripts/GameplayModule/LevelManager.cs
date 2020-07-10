@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Enums;
 using UnityEngine;
 using Grid = GridModule.Models.Grid;
 using GridPoint = GridModule.Models.GridPoint;
 using Tile = GridModule.Models.Tile;
 using TileData = GridModule.Models.TileData;
+using GridModule;
 using GridModule.Services;
 
 namespace GameplayModule
@@ -29,7 +31,17 @@ namespace GameplayModule
         private TimelineController _timelineController;
 
         private Dictionary<string, GameObject> _tileToBagMap;
-        private List<Grid> _grids;
+        private List<Grid> _initializedGrids;
+        private BagController[] _bags;
+        private bool _shouldRefreshBagsOnUpdate;
+
+        private bool AreAllBagsOnCart => _bags
+            .ToList()
+            .Aggregate(true, (areAllBagsOnCart, bag) => areAllBagsOnCart && bag.isOnCart);
+        
+        private bool AreAllBagsOnShelf => _bags
+            .ToList()
+            .Aggregate(true, (areAllBagsOnCart, bag) => areAllBagsOnCart && bag.isOnShelf);
 
         private static readonly System.Random Rnd = new System.Random();
 
@@ -47,80 +59,19 @@ namespace GameplayModule
                 {"2X2", bag2X2Prefab},
             };
             
-            _grids = GetInitializedGrids();
+            _initializedGrids = InitializedGridList.GetGrids();
         }
 
         private Grid GetRandomGrid()
         {
-            return _grids[Rnd.Next(_grids.Count)];
-        }
-        
-        private static List<Grid> GetInitializedGrids()
-        {
-            return new List<Grid>
-            {
-                new Grid(new [,] {
-                    {1, 1, 1, 0, 0, 0},
-                    {1, 1, 1, 1, 1, 1},
-                    {0, 1, 0, 1, 0, 0},
-                    {0, 0, 0, 1, 0, 0},
-                    {1, 1, 1, 1, 1, 1},
-                    {0, 0, 1, 0, 0, 0},
-                }),
-                new Grid(new [,] {
-                    {1, 1, 1, 0, 0, 1},
-                    {1, 1, 1, 1, 1, 1},
-                    {0, 1, 0, 0, 1, 0},
-                    {0, 0, 0, 0, 0, 0},
-                    {1, 1, 1, 1, 1, 1},
-                    {0, 0, 1, 0, 0, 0},
-                }),
-                new Grid(new[,] {
-                    {1, 1, 1, 0, 0, 0},
-                    {1, 1, 1, 1, 1, 1},
-                    {0, 1, 0, 0, 0, 1},
-                    {0, 0, 1, 0, 0, 1},
-                    {1, 1, 1, 1, 1, 1},
-                    {0, 0, 1, 0, 0, 0},
-                }),
-                new Grid(new [,] {
-                    {1, 1, 1, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1},
-                    {0, 1, 0, 0, 0, 0},
-                    {0, 0, 0, 0, 0, 1},
-                    {1, 1, 1, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1},
-                }),
-                new Grid(new [,] {
-                    {1, 1, 1, 0, 0, 0},
-                    {1, 1, 1, 1, 1, 1},
-                    {0, 1, 1, 0, 0, 0},
-                    {0, 0, 0, 1, 1, 0},
-                    {1, 1, 1, 1, 1, 1},
-                    {1, 0, 0, 1, 0, 0},
-                }),
-                new Grid(new [,] {
-                    {1, 1, 1, 1, 0, 0},
-                    {1, 1, 1, 1, 1, 1},
-                    {1, 0, 0, 0, 0, 0},
-                    {0, 0, 0, 0, 0, 1},
-                    {1, 1, 1, 1, 1, 1},
-                    {0, 0, 0, 0, 0, 1},
-                }),
-                new Grid(new [,] {
-                    {1, 1, 1, 0, 0, 0},
-                    {1, 1, 1, 1, 1, 1},
-                    {0, 0, 0, 0, 0, 0},
-                    {0, 0, 0, 1, 0, 0},
-                    {1, 1, 1, 1, 1, 1},
-                    {1, 0, 0, 0, 0, 1},
-                }),
-            };
+            return _initializedGrids[Rnd.Next(_initializedGrids.Count)];
         }
 
         public void CreateRandomLevel(DifficultyEnum difficulty)
         {
             CreateLevel(GetRandomGrid(), difficulty);
+            
+            _shouldRefreshBagsOnUpdate = true;
         }
 
         private void CreateLevel(Grid grid, DifficultyEnum difficulty)
@@ -143,8 +94,31 @@ namespace GameplayModule
 
         private void GenerateBags(List<TileData> tiles)
         {
-            List<BagController> createdBags = tiles.ConvertAll(CreateBagByTile);            
-            _timelineController.InitBags(createdBags.ToArray());
+            List<BagController> createdBags = tiles.ConvertAll(CreateBagByTile);
+            _bags = createdBags.ToArray();
+            
+            foreach (var bag in _bags)
+            {
+                bag.OnBagPickupStatusChangeEvent += OnBagPickupStatusChange;
+            }
+        }
+
+        private void OnBagPickupStatusChange()
+        {
+            _timelineController.OnBagPickupStatusChange(AreAllBagsOnShelf, AreAllBagsOnCart);
+        }
+
+        public void ClearCreatedInstances()
+        {
+            foreach (BagController bag in _bags)
+            {
+                Destroy(bag.gameObject);
+            }
+
+            foreach (GameObject generatedGridElement in generatedGridElements)
+            {
+                Destroy(generatedGridElement);
+            }
         }
 
         private BagController CreateBagByTile(TileData gridTile)
@@ -200,6 +174,19 @@ namespace GameplayModule
                 
                 gridElement.GetComponent<GridElementController>().interactionManager = _interactionManager;
                 generatedGridElements.Add(gridElement);
+            }
+        }
+
+        public void Update()
+        {
+            if (_shouldRefreshBagsOnUpdate)
+            {
+                foreach (BagController bag in _bags)
+                {
+                    bag.RefreshGridElements();
+                }
+
+                _shouldRefreshBagsOnUpdate = false;
             }
         }
     }
