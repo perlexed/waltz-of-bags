@@ -13,6 +13,7 @@ namespace GameplayModule
         public InteractionManager interactionManager;
         public DifficultyEnum difficulty;
         public Button ResetBagsButton;
+        public GameObject loadingText;
 
         public float victoryWaitTime = 1f;
         private float _victoryTime;
@@ -20,8 +21,10 @@ namespace GameplayModule
         private BagController[] _bags;
 
         private LevelManager _levelManager;
+        private CommendationsManager _commendationsManager;
 
         private bool _isFirstUpdate = true;
+        private bool _isSecondUpdate;
         private bool _shouldRefreshBagsOnUpdate;
 
         private bool AreAllBagsOnCart => _bags
@@ -35,6 +38,7 @@ namespace GameplayModule
         private void Start()
         {
             _levelManager = gameObject.GetComponent<LevelManager>();
+            _commendationsManager = gameObject.GetComponent<CommendationsManager>();
         }
 
         private void CreateLevel()
@@ -90,12 +94,11 @@ namespace GameplayModule
             gameObject.GetComponent<CommendationsManager>().OnVictory();
         }
 
-        public void ReturnBagsOnCart()
+        public void RestartGame()
         {
-            foreach (BagController bagController in _bags)
-            {
-                bagController.PlaceOnCart();
-            }
+            _commendationsManager.ResetCommendations();
+            
+            ClearLevelAndStartNew();
         }
 
         public void ClearLevelAndStartNew()
@@ -126,6 +129,10 @@ namespace GameplayModule
             {
                 CreateLevel();
                 _isFirstUpdate = false;
+                _isSecondUpdate = true;
+            } else if (_isSecondUpdate)
+            {
+                loadingText.SetActive(false);
             }
 
             if (_shouldRefreshBagsOnUpdate)
@@ -134,6 +141,8 @@ namespace GameplayModule
                 {
                     bag.RefreshGridElements();
                 }
+
+                _shouldRefreshBagsOnUpdate = false;
             }
 
             if (!isRunning && Time.time - _victoryTime >= victoryWaitTime)
